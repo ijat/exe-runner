@@ -32,11 +32,26 @@ std::string replaceStr(std::string str, const std::string& from, const std::stri
     return str;
 }
 
-int main(int argc, char* argv[]) {
+std::vector<std::string> split (std::string s, std::string delimiter) {
+    size_t pos_start = 0, pos_end, delim_len = delimiter.length();
+    std::string token;
+    std::vector<std::string> res;
 
+    while ((pos_end = s.find (delimiter, pos_start)) != std::string::npos) {
+        token = s.substr (pos_start, pos_end - pos_start);
+        pos_start = pos_end + delim_len;
+        res.push_back (token);
+    }
+
+    res.push_back (s.substr (pos_start));
+    return res;
+}
+
+int main(int argc, char* argv[]) {
     // get current exe name
-    std::string fullpath(argv[0]);
-    std::string filename = replaceStr(fullpath, GetCurrentWorkingDir() + PATH_DELIM, "");
+    std::string fp(argv[0]);
+    auto fpv = split(fp, PATH_DELIM);
+    std::string filename = fpv[fpv.size()-1];
 
     // convert array to single string
     std::vector<std::string> argList(argv + 1, argv + argc);
@@ -44,7 +59,7 @@ int main(int argc, char* argv[]) {
     for (const auto &a : argList) args += a + " ";
 
     // run
-    std::string cmd = fullpath + SUFFIX + PATH_DELIM + filename + " " + args;
+    std::string cmd = GetCurrentWorkingDir() + PATH_DELIM + filename + SUFFIX + PATH_DELIM + filename + " " + args;
     std::system(cmd.c_str());
     return 0;
 }
